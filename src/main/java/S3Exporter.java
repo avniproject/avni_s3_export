@@ -1,14 +1,29 @@
+import java.io.File;
+import java.nio.file.InvalidPathException;
+
 public class S3Exporter {
 
-    private ConceptReader conceptReader;
-    private ConceptProcessor conceptProcessor;
 
-    public S3Exporter(ConceptReader conceptReader, ConceptProcessor conceptProcessor) {
-        this.conceptReader = conceptReader;
-        this.conceptProcessor = conceptProcessor;
+    public static void S3Export(Address address, S3Data s3Data, int counter, MetaData metaData) {
+        String basePath = "/Users/sachink/project/s3data/";
+        String imagePath = "/Users/sachink/avni/avni-s3-export/src/main/resources/images/";
+        File newPath = new File(basePath + address.getState() + "/" + address.getDistrict() + "/" + address.getTaluka() + "/" + address.getGpVillage() + "/" + address.getDam() + "/");
+        createDirectory(newPath);
+        CopyFile.copy(s3Data, imagePath, newPath,counter,metaData);
     }
 
-    public void export() {
-        conceptReader.read().stream().forEach(uuid -> conceptProcessor.process(uuid));
+    private static void createDirectory(File newFile) {
+        try {
+            if (newFile.mkdirs()) {
+                System.out.println("Created new directory as " + newFile.getAbsolutePath());
+            } else {
+                System.out.println("Directory already present");
+            }
+        } catch (InvalidPathException e) {
+            System.out.println("Exception");
+            e.printStackTrace();
+        }
     }
+
+
 }

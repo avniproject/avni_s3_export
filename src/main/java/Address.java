@@ -12,4 +12,44 @@ public class Address {
         this.gpVillage = gpVillage;
         this.dam = dam;
     }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getTaluka() {
+        return taluka;
+    }
+
+    public void setTaluka(String taluka) {
+        this.taluka = taluka;
+    }
+
+    public String getGpVillage() {
+        return gpVillage;
+    }
+
+    public void setGpVillage(String gpVillage) {
+        this.gpVillage = gpVillage;
+    }
+
+    public String getDam() {
+        return dam;
+    }
+
+    public void setDam(String dam) {
+        this.dam = dam;
+    }
 }

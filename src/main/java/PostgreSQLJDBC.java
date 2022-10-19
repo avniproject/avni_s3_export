@@ -5,31 +5,32 @@ import java.util.ArrayList;
 public class PostgreSQLJDBC {
 
     private static final String addressSQLSelectPart = "\"State\", \"District\", \"Taluka\", \"GP/Village\", \"Dam\" ";
+    private static final String subjectMetaDataSQLSelectPart = "first_name, registration_date ";
+
 
     public String getS3Url(ArrayList<TableAndColumnData> tableAndColumnData) {
         try (Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/openchs?currentSchema=rwbniti", "openchs", "password")) {
             System.out.println("Connected to PostgreSQL database!");
             Statement statement = connection.createStatement();
+
             for (TableAndColumnData tableAndColumnDataEntry : tableAndColumnData) {
+
                 for (ColumnData columnData : tableAndColumnDataEntry.getColumnNameAndS3URL()) {
-                    String sql = new StringBuilder().append("Select ")
-                            .append("\"" + columnData.getColumnName() + "\" , ")
-                            .append(addressSQLSelectPart)
-                            .append("from ")
-                            .append(tableAndColumnDataEntry.getTableName())
-                            .append(" join address on address.id = " + tableAndColumnDataEntry.getTableName() + ".address_id;")
-                            .toString();
-                    System.out.println("SQL ----> "+sql);
+
+                    String sql = getSqlForSubject(tableAndColumnDataEntry, columnData);
                     ResultSet resultSet = statement.executeQuery(sql);
+                    int counter = 0;
                     while (resultSet.next()) {
+                        counter = counter + 1;
                         String columnS3Url = resultSet.getString(columnData.getColumnName());
                         System.out.println("Column S3 URL mil gaya na bhai" + columnS3Url);
-                        System.out.println("Column S3 URL mil gaya na bhai" + resultSet.getString("State"));
-                        Address address = new Address(resultSet.getString("State"),resultSet.getString("District"), resultSet.getString("Taluka"),
-                                resultSet.getString("GP/Village"), resultSet.getString("Dam"));
+                        Address address = new Address(resultSet.getString("State"), resultSet.getString("District"), resultSet.getString("Taluka"), resultSet.getString("GP/Village"), resultSet.getString("Dam"));
                         S3Data s3Data = new S3Data(resultSet.getString(columnData.getColumnName()), address);
+                        MetaData metaData = new MetaData(resultSet.getString("first_name"), resultSet.getString("registration_date"));
                         columnData.setS3Data(s3Data);
+                        S3Exporter.S3Export(address, s3Data, counter, metaData);
                     }
+
                 }
             }
         } catch (SQLException e) {
@@ -38,6 +39,31 @@ public class PostgreSQLJDBC {
         }
 
         return "something;";
+    }
+
+    private String getSqlForSubject(TableAndColumnData tableAndColumnDataEntry, ColumnData columnData) {
+        String sql = new StringBuilder().append("Select ")
+                .append("\"" + columnData.getColumnName() + "\" , ")
+                .append(addressSQLSelectPart + " ,")
+                .append(subjectMetaDataSQLSelectPart)
+                .append(" from ")
+                .append(tableAndColumnDataEntry.getTableName())
+                .append(" join address on address.id = " + tableAndColumnDataEntry.getTableName() + ".address_id")
+                .append(" where " + "\"" + columnData.getColumnName() + "\" notnull")
+                .toString();
+        System.out.println("SQL-->" + sql);
+        return sql;
+    }
+
+    private String getSqlForEncounters(TableAndColumnData tableAndColumnDataEntry, ColumnData columnData) {
+        String sql = new StringBuilder().append("Select ")
+                .append("\"" + columnData.getColumnName() + "\" , ")
+                .append(addressSQLSelectPart).append("from ")
+                .append(tableAndColumnDataEntry.getTableName())
+                .append(" join address on address.id = " + tableAndColumnDataEntry.getTableName() + ".address_id")
+                .append("where \"" + columnData.getColumnName() + "\" notnull")
+                .toString();
+        return sql;
     }
 
 }
