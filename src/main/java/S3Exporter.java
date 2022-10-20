@@ -9,16 +9,12 @@ public class S3Exporter {
         String imagePath = "/Users/sachink/avni/avni-s3-export/src/main/resources/images/";
         File newPath = new File(basePath + address.getState() + "/" + address.getDistrict() + "/" + address.getTaluka() + "/" + address.getGpVillage() + "/" + address.getDam() + "/");
         createDirectory(newPath);
-        CopyFile.copy(s3Data, imagePath, newPath,counter,metaData,columnName);
+        CopyFile.copy(s3Data, imagePath, newPath, counter, metaData, columnName);
     }
 
     private static void createDirectory(File newFile) {
         try {
-            if (newFile.mkdirs()) {
-                System.out.println("Created new directory as " + newFile.getAbsolutePath());
-            } else {
-                System.out.println("Directory already present");
-            }
+            newFile.mkdirs();
         } catch (InvalidPathException e) {
             System.out.println("Exception");
             e.printStackTrace();

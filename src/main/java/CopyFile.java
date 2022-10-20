@@ -14,8 +14,6 @@ public class CopyFile {
         try {
             Files.copy(srcPath, destPath);
             renameFile(newPath, metaData, fileName, destPath, columnName);
-            System.out.println("file copied to ------------------> " + destPath);
-            System.out.println("Total file copied for " + columnName + " ==> " + counter);
         } catch (IOException e) {
             System.out.println("Error while copying " + e);
         }
