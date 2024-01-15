@@ -7,7 +7,8 @@ import java.nio.file.Paths;
 
 public class CopyFile {
     public static void copy(S3Data s3Data, String imagePath, File newPath, int counter, MetaData metaData, String columnName) {
-        String fileName = s3Data.getS3Url().substring(s3Data.getS3Url().length() - 40);
+        String s3UrlWithoutSpecialChar = s3Data.getS3Url().replace("\"]", "");
+        String fileName = s3UrlWithoutSpecialChar.substring(s3UrlWithoutSpecialChar.length() - 40);
 
         Path srcPath = Paths.get(imagePath + fileName);
         Path destPath = Paths.get(String.valueOf(newPath) + fileName);
